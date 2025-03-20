@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Strategy Backtest</title>
+    <script>
+        async function fetchStrategy() {
+            let symbol = document.getElementById("symbol").value;
+            let strategy = document.getElementById("strategy").value;
+            let short_window = document.getElementById("short_window").value;
+            let long_window = document.getElementById("long_window").value;
+            let stop_loss_pct = document.getElementById("stop_loss_pct").value;
+
+            let response = await fetch("/strategy", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ symbol, strategy, short_window, long_window, stop_loss_pct })
+            });
+
+            let result = await response.json();
+            document.getElementById("gmrr").innerText = "Annual GMRR: " + result.gmrr;
+            document.getElementById("vol").innerText = "Annual Volatility: " + result.volatility;
+            document.getElementById("sharpe").innerText = "Sharpe Ratio: " + result.sharpe_ratio;
+            document.getElementById("chart").src = "static/trading_signals.png";
+        }
+    </script>
+</head>
+<body>
+    <h1>Trading Strategy Backtest</h1>
+    <label>Stock Symbol:</label>
+    <input type="text" id="symbol" value="AAPL">
+    <label>Strategy:</label>
+    <select id="strategy">
+        <option value="SMA">SMA</option>
+        <option value="EMA">EMA</option>
+        <option value="RSI">RSI</option>
+        <option value="MACD">MACD</option>
+    </select>
+    <label>Short Window:</label>
+    <input type="number" id="short_window" value="50">
+    <label>Long Window:</label>
+    <input type="number" id="long_window" value="200">
+    <label>Stop Loss (%):</label>
+    <input type="number" id="stop_loss_pct" value="0.05">
+    <button onclick="fetchStrategy()">Run Backtest</button>
+
+    <h3>Results:</h3>
+    <p id="gmrr"></p>
+    <p id="vol"></p>
+    <p id="sharpe"></p>
+    <img id="chart" width="600">
+</body>
+</html>
